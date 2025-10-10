@@ -984,6 +984,48 @@
                     </configuration>
                 </plugin>
 
+              <plugin>
+    <groupId>com.github.spotbugs</groupId>
+    <artifactId>spotbugs-maven-plugin</artifactId>
+    <version>4.8.5.0</version> <!-- Use the latest version -->
+    <configuration>
+        <!-- Enable XML report output -->
+        <xmlOutput>true</xmlOutput>
+        
+        <!-- Optional: You can disable the default HTML report if you don't need it -->
+        <htmlOutput>false</htmlOutput>
+        
+        <!-- Optional: Set effort to Max for a more thorough analysis -->
+        <effort>Max</effort>
+        
+        <!-- Optional: Set a threshold for bug severity to be included in the report -->
+        <threshold>Low</threshold>
+
+        <!-- =================================================== -->
+        <!-- == ADD THIS SECTION to enable FindSecBugs        == -->
+        <!-- =================================================== -->
+        <plugins>
+            <plugin>
+                <groupId>com.h3xstream.findsecbugs</groupId>
+                <artifactId>findsecbugs-plugin</artifactId>
+                <version>1.12.0</version> <!-- Use the latest FindSecBugs version -->
+            </plugin>
+        </plugins>
+
+    </configuration>
+    <executions>
+        <execution>
+            <id>spotbugs-report</id>
+            <!-- Bind the report generation to the 'verify' phase -->
+            <phase>verify</phase>
+            <goals>
+                <!-- Use the 'spotbugs' goal, which generates a report and does NOT fail the build -->
+                <goal>spotbugs</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+
                 <!-- Ban bad dependencies and require Java 11 for deploying -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
