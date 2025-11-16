@@ -1,5 +1,4 @@
 # .github/workflows/embold-scan_fc.yml
-
 name: Embold Code Quality Scan
 
 on:
@@ -7,7 +6,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch:  
+  workflow_dispatch: 
 
 jobs:
   embold-scan_fc:
@@ -28,11 +27,11 @@ jobs:
           distribution: 'temurin'
 
       # Step 3: Build the project and run SpotBugs
-      # --- FIX APPLIED HERE: Increase MAVEN_OPTS for the forked Galleon process ---
+      # --- FIX APPLIED HERE: Removed deprecated MaxPermSize for JDK 17 ---
       - name: Build with Maven and Run Analysis
         env:
-          # Increase the JVM heap size to prevent 'Forked embedded process has failed' errors
-          MAVEN_OPTS: -Xmx4096m -XX:MaxPermSize=512m
+          # Use only valid JVM options for JDK 17. MaxPermSize is deprecated.
+          MAVEN_OPTS: -Xmx4096m 
         run: mvn -B clean verify -DskipTests
       # --------------------------------------------------------------------------
 
