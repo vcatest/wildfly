@@ -1,52 +1,51 @@
-# .github/workflows/embold-scan_fc.yml
+# #.github/workflows/embold-scan_fc.yml
+
 name: Embold Code Quality Scan
 
+# This workflow runs on every push to the 'master' branch, pull requests, and manual dispatch
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
-  workflow_dispatch: 
+    branches: [ master ]
+  workflow_dispatch:  
 
 jobs:
   embold-scan_fc:
+    # Use the latest version of Ubuntu to run the job
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Check out your repository code
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # Step 2: Set up the Java environment
+        
+      # Step 2: Set up Java environment (Assuming a standard Maven/WildFly project uses Java 17)
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '17' # Choose the correct Java version for your WildFly project
           distribution: 'temurin'
+          cache: 'maven'
 
-      # Step 3: Build the project and run SpotBugs
-      # --- FIX APPLIED HERE: Removed deprecated MaxPermSize for JDK 17 ---
-      - name: Build with Maven and Run Analysis
-        env:
-          # Use only valid JVM options for JDK 17. MaxPermSize is deprecated.
-          MAVEN_OPTS: -Xmx4096m 
-        run: mvn -B clean verify -DskipTests
-      # --------------------------------------------------------------------------
+      # Step 3: Explicitly run the Maven build (This is where the original error occurred)
+      - name: Build Project with Maven
+        run: mvn -B clean install -DskipTests
+        # -B for batch mode (non-interactive)
+        # -DskipTests to speed up the CI process if tests are run in a separate step
 
-      # Step 4: Download and extract the Embold scanner
+      # Step 4: Download and extract the Embold scanner (Step 2 in original)
       - name: Download and Extract Scanner
         run: |
           curl https://v1.embold.io/nfs/CLI/browserstack-codequality-scanner.tar.gz -o browserstack-codequality-scanner-archive.tar.gz
           tar xvf browserstack-codequality-scanner-archive.tar.gz
 
-      # Step 5: Download the repository configuration file
+      ## Step 5: Download the repository configuration file (Step 3 in original)
       - name: Download Repository Configuration
         run: |
-          curl --silent --location --request GET "http://18.184.13.138:3089/api/v1/repositories/61fb315d9460349bcdd41a2a79f079e7/scans/config/download" --header "Authorization: Bearer ${{ secrets.EMBOLD_SCAN_TOKEN_FC }}" -o repository-configuration.json
+          curl --silent --location --request GET "http://18.184.13.138:3089/api/v1/repositories/dfb6700d2f187281f0176fc63a3820c1/scans/config/download" --header "Authorization: Bearer ${{ secrets.EMBOLD_SCAN_TOKEN_FC }}" -o repository-configuration.json
 
-      # Step 6: Run the Embold analysis scanner
+      # Step 6: Run the Embold analysis scanner (Step 4 in original)
       - name: Run Embold Scanner
         env:
           EMBOLD_TOKEN: ${{ secrets.EMBOLD_SCAN_TOKEN_FC }}
@@ -54,7 +53,7 @@ jobs:
           ./browserstack-codequality-scanner/bin/embold-scanner analyse \
             -u http://18.184.13.138:3089 \
             -t $EMBOLD_TOKEN \
-            -r 61fb315d9460349bcdd41a2a79f079e7 \
+            -r dfb6700d2f187281f0176fc63a3820c1 \
             -b . \
             -d ./embold-data \
             -c ./repository-configuration.json \
