@@ -40,10 +40,11 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_VCATEST }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # Changed 'verify' to 'install' to resolve SNAPSHOT dependency issues
         run: >
           mvn -B install org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
           -DskipTests 
+          -Dspotbugs.skip=true 
+          -Dmaven.repository.url=https://repository.jboss.org/nexus/content/groups/public/
           -Dsonar.projectKey=vcatest_wildfly 
           -Dsonar.organization=vcatest 
           -Dsonar.host.url=https://sonarcloud.io
